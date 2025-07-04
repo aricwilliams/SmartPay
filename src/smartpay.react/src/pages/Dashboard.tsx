@@ -37,7 +37,7 @@ const stats = [
   },
   {
     name: 'Avg. Time',
-    value: 2.4,
+    value: 2.5,
     suffix: 'hrs',
     change: -15.3,
     icon: ClockIcon,
