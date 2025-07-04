@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35004.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPay", "SmartPay\SmartPay.csproj", "{2B838FB7-0F67-4BFF-852D-B8CC20BADD02}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "smartpay.react", "src\SmartPay.React\smartpay.react.esproj", "{6EEA24AC-09E3-45F6-9DB0-F30FB513C45D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2B838FB7-0F67-4BFF-852D-B8CC20BADD02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B838FB7-0F67-4BFF-852D-B8CC20BADD02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B838FB7-0F67-4BFF-852D-B8CC20BADD02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B838FB7-0F67-4BFF-852D-B8CC20BADD02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EEA24AC-09E3-45F6-9DB0-F30FB513C45D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EEA24AC-09E3-45F6-9DB0-F30FB513C45D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EEA24AC-09E3-45F6-9DB0-F30FB513C45D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{6EEA24AC-09E3-45F6-9DB0-F30FB513C45D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EEA24AC-09E3-45F6-9DB0-F30FB513C45D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EEA24AC-09E3-45F6-9DB0-F30FB513C45D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DE0667D0-EAFB-41DD-AF85-D7C02697D2C0}
+	EndGlobalSection
+EndGlobal
