@@ -1,7 +1,10 @@
 export const formatCurrency = (amount: number, currency: string = "USD"): string => {
+  const validCurrencies = ["USD", "USDC", "ETH"];
+  const resolvedCurrency = validCurrencies.includes(currency) ? (currency === "USDC" ? "USD" : currency) : "USD";
+
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: currency === "USDC" ? "USD" : currency,
+    currency: resolvedCurrency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);

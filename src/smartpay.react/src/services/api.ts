@@ -1,6 +1,22 @@
 import axios from "axios";
 import { Job, Transaction, Wallet } from "../types";
 
+export interface MilestoneCreate {
+  title: string;
+  description: string;
+  amount: number;
+  dueDate: string; // ISO string (e.g. 2025-08-15T23:59:59Z)
+}
+
+export interface JobCreate {
+  title: string;
+  description: string;
+  client: string;
+  contractor: string;
+  totalAmount: number;
+  currency: string;
+  milestones: MilestoneCreate[];
+}
 const API_BASE_URL = import.meta.env.REACT_APP_API_URL || "https://localhost:7052/api";
 
 export const fetchJobs = async (): Promise<Job[]> => {
@@ -88,3 +104,12 @@ export const rulesApi = {
   updateRule: (id: string, rule: any) => api.put(`/rules/${id}`, rule),
   deleteRule: (id: string) => api.delete(`/rules/${id}`),
 };
+
+export async function createJob(payload: JobCreate): Promise<Job> {
+  try {
+    const { data } = await api.post<Job>("/jobs", payload);
+    return data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message || "Failed to create job");
+  }
+}

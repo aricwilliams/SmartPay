@@ -1,23 +1,22 @@
+// types/models.ts
+import { JobCreate, MilestoneCreate } from "./dto";
+
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'operator' | 'client';
+  role: "admin" | "operator" | "client";
   avatar?: string;
 }
 
-export interface Job {
+export interface Job extends JobCreate {
   id: string;
-  title: string;
-  description: string;
-  client: string;
-  contractor: string;
-  totalAmount: number;
-  currency: 'USD' | 'USDC' | 'ETH';
-  status: 'pending' | 'active' | 'completed' | 'disputed';
-  milestones: Milestone[];
+  status: "pending" | "active" | "completed" | "disputed";
   createdAt: string;
   updatedAt: string;
+  title: any;
+  description: any;
+  milestones: Milestone[];
   location?: {
     lat: number;
     lng: number;
@@ -25,28 +24,24 @@ export interface Job {
   };
 }
 
-export interface Milestone {
+export interface Milestone extends MilestoneCreate {
   id: string;
-  title: string;
-  description: string;
-  amount: number;
-  status: 'pending' | 'in_progress' | 'completed' | 'released';
-  dueDate: string;
+  status: "pending" | "in_progress" | "completed" | "released";
   conditions: PaymentCondition[];
   evidence?: Evidence[];
 }
 
 export interface PaymentCondition {
   id: string;
-  type: 'time' | 'location' | 'approval' | 'iot' | 'custom';
-  operator: 'equals' | 'greater_than' | 'less_than' | 'contains';
+  type: "time" | "location" | "approval" | "iot" | "custom";
+  operator: "equals" | "greater_than" | "less_than" | "contains";
   value: string;
   description: string;
 }
 
 export interface Evidence {
   id: string;
-  type: 'photo' | 'document' | 'gps' | 'signature';
+  type: "photo" | "document" | "gps" | "signature";
   url: string;
   description: string;
   timestamp: string;
@@ -58,7 +53,7 @@ export interface Wallet {
   balance: number;
   currency: string;
   address: string;
-  type: 'fiat' | 'crypto';
+  type: "fiat" | "crypto";
   isActive: boolean;
 }
 
@@ -68,8 +63,8 @@ export interface Transaction {
   jobId?: string;
   amount: number;
   currency: string;
-  type: 'escrow' | 'release' | 'refund' | 'deposit' | 'withdrawal';
-  status: 'pending' | 'completed' | 'failed';
+  type: "escrow" | "release" | "refund" | "deposit" | "withdrawal";
+  status: "pending" | "completed" | "failed";
   description: string;
   timestamp: string;
   processorRef?: string;
@@ -87,7 +82,7 @@ export interface PaymentRule {
 
 export interface PaymentAction {
   id: string;
-  type: 'release' | 'hold' | 'notify' | 'split';
+  type: "release" | "hold" | "notify" | "split";
   parameters: Record<string, any>;
   description: string;
 }
