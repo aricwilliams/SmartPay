@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Job } from "../types";
+import { Job, Transaction, Wallet } from "../types";
 
 const API_BASE_URL = import.meta.env.REACT_APP_API_URL || "https://localhost:7052/api";
 
@@ -15,6 +15,20 @@ export const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+export const fetchWallets = async (userId: string): Promise<Wallet[]> => {
+  const { data } = await axios.get<Wallet[]>(`${API_BASE_URL}/wallets`, { params: { userId } });
+  return data;
+};
+
+export const createWallet = async (userId: string, type: "fiat" | "crypto", currency: string) => {
+  await axios.post(`${API_BASE_URL}/wallets`, { userId, type, currency });
+};
+
+export const fetchTransactions = async (walletId: string): Promise<Transaction[]> => {
+  const { data } = await axios.get<Transaction[]>(`${API_BASE_URL}/wallets/${walletId}/transactions`);
+  return data;
+};
 
 // Request interceptor to add auth token
 api.interceptors.request.use(

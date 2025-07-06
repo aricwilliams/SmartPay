@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartPay.Models;
+using System.Reflection.Emit;
 
 public class SmartPayDbContext : DbContext
 {
@@ -12,6 +13,9 @@ public class SmartPayDbContext : DbContext
     public DbSet<JobLocation> JobLocations => Set<JobLocation>();
     public DbSet<PaymentCondition> PaymentConditions => Set<PaymentCondition>();
     public DbSet<Evidence> Evidence => Set<Evidence>();
+    public DbSet<Wallet> Wallets => Set<Wallet>();
+    public DbSet<Transaction> Transactions => Set<Transaction>();
+
     protected override void OnModelCreating(ModelBuilder b)
     {
         b.Entity<Job>()
@@ -35,5 +39,24 @@ public class SmartPayDbContext : DbContext
             .HasMany(m => m.Evidence)
             .WithOne(e => e.Milestone)
             .HasForeignKey(e => e.MilestoneId);
+        b.Entity<Wallet>()
+        .HasMany(w => w.Transactions)
+        .WithOne(t => t.Wallet)
+        .HasForeignKey(t => t.WalletId);
+
+
+        // 🎯 Explicit enum-to-int conversion for WalletType
+        b.Entity<Wallet>()
+            .Property(w => w.Type)
+            .HasConversion<int>();
+
+        // 🎯 Optional: Transaction enum conversions too
+        b.Entity<Transaction>()
+            .Property(t => t.Type)
+        .HasConversion<int>();
+
+        b.Entity<Transaction>()
+            .Property(t => t.Status)
+            .HasConversion<int>();
     }
 }
