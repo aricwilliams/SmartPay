@@ -1,116 +1,46 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { PlusIcon, MapPinIcon, ClockIcon } from '@heroicons/react/24/outline';
-import { Card, CardContent, CardHeader } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
-import { Modal } from '../components/ui/Modal';
-import { formatCurrency, formatRelativeTime } from '../utils/formatting';
-import { Job } from '../types';
-
-const mockJobs: Job[] = [
-  {
-    id: '1',
-    title: 'City Center Delivery',
-    description: 'Deliver packages to downtown business district',
-    client: 'FastShip Logistics',
-    contractor: 'Mike Johnson',
-    totalAmount: 2500,
-    currency: 'USD',
-    status: 'active',
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T14:30:00Z',
-    location: {
-      lat: 40.7128,
-      lng: -74.0060,
-      address: '123 Main St, New York, NY'
-    },
-    milestones: [
-      {
-        id: '1',
-        title: 'Pickup Confirmation',
-        description: 'Confirm package pickup from warehouse',
-        amount: 500,
-        status: 'completed',
-        dueDate: '2024-01-15T12:00:00Z',
-        conditions: []
-      },
-      {
-        id: '2',
-        title: 'Delivery Completion',
-        description: 'Deliver all packages to destinations',
-        amount: 2000,
-        status: 'in_progress',
-        dueDate: '2024-01-15T18:00:00Z',
-        conditions: []
-      }
-    ]
-  },
-  {
-    id: '2',
-    title: 'Website Development',
-    description: 'Build responsive e-commerce website',
-    client: 'TechStart Inc',
-    contractor: 'Sarah Chen',
-    totalAmount: 5000,
-    currency: 'USDC',
-    status: 'pending',
-    createdAt: '2024-01-14T09:00:00Z',
-    updatedAt: '2024-01-14T15:20:00Z',
-    milestones: [
-      {
-        id: '3',
-        title: 'Design Mockups',
-        description: 'Create initial design concepts',
-        amount: 1500,
-        status: 'pending',
-        dueDate: '2024-01-20T17:00:00Z',
-        conditions: []
-      },
-      {
-        id: '4',
-        title: 'Frontend Development',
-        description: 'Implement responsive frontend',
-        amount: 2500,
-        status: 'pending',
-        dueDate: '2024-01-25T17:00:00Z',
-        conditions: []
-      },
-      {
-        id: '5',
-        title: 'Backend Integration',
-        description: 'Connect to payment and inventory systems',
-        amount: 1000,
-        status: 'pending',
-        dueDate: '2024-01-30T17:00:00Z',
-        conditions: []
-      }
-    ]
-  }
-];
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { PlusIcon, MapPinIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { Card, CardContent, CardHeader } from "../components/ui/Card";
+import { Button } from "../components/ui/Button";
+import { Badge } from "../components/ui/Badge";
+import { Modal } from "../components/ui/Modal";
+import { formatCurrency, formatRelativeTime } from "../utils/formatting";
+import { Job } from "../types";
+import { useJobs } from "../hooks/useJobs";
 
 export const Jobs: React.FC = () => {
-  const [jobs] = useState<Job[]>(mockJobs);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const jobs = useJobs();
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'success';
-      case 'pending': return 'warning';
-      case 'completed': return 'info';
-      case 'disputed': return 'error';
-      default: return 'default';
+      case "active":
+        return "success";
+      case "pending":
+        return "warning";
+      case "completed":
+        return "info";
+      case "disputed":
+        return "error";
+      default:
+        return "default";
     }
   };
 
   const getMilestoneStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'success';
-      case 'in_progress': return 'warning';
-      case 'pending': return 'default';
-      case 'released': return 'info';
-      default: return 'default';
+      case "completed":
+        return "success";
+      case "in_progress":
+        return "warning";
+      case "pending":
+        return "default";
+      case "released":
+        return "info";
+      default:
+        return "default";
     }
   };
 
@@ -126,12 +56,7 @@ export const Jobs: React.FC = () => {
       {/* Jobs Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {jobs.map((job, index) => (
-          <motion.div
-            key={job.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
+          <motion.div key={job.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }}>
             <Card hoverable className="cursor-pointer" onClick={() => setSelectedJob(job)}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -141,7 +66,7 @@ export const Jobs: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-gray-600 line-clamp-2">{job.description}</p>
-                
+
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-500">Client:</span>
@@ -177,14 +102,14 @@ export const Jobs: React.FC = () => {
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-500">Progress:</span>
                     <span className="font-medium">
-                      {job.milestones.filter(m => m.status === 'completed').length} / {job.milestones.length}
+                      {job.milestones.filter((m) => m.status === "completed").length} / {job.milestones.length}
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${(job.milestones.filter(m => m.status === 'completed').length / job.milestones.length) * 100}%` 
+                      style={{
+                        width: `${(job.milestones.filter((m) => m.status === "completed").length / job.milestones.length) * 100}%`,
                       }}
                     />
                   </div>
@@ -197,12 +122,7 @@ export const Jobs: React.FC = () => {
 
       {/* Job Details Modal */}
       {selectedJob && (
-        <Modal
-          isOpen={!!selectedJob}
-          onClose={() => setSelectedJob(null)}
-          title={selectedJob.title}
-          size="xl"
-        >
+        <Modal isOpen={!!selectedJob} onClose={() => setSelectedJob(null)} title={selectedJob.title} size="xl">
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -284,63 +204,42 @@ export const Jobs: React.FC = () => {
       )}
 
       {/* Create Job Modal */}
-      <Modal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Create New Job"
-        size="lg"
-      >
+      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Create New Job" size="lg">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter job title"
-              />
+              <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Enter job title" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Total Amount</label>
-              <input
-                type="number"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="0.00"
-              />
+              <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0.00" />
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Describe the job requirements..."
-            />
+            <textarea rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Describe the job requirements..." />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Client</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Client name"
-              />
+              <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Client name" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Contractor</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Contractor name"
-              />
+              <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Contractor name" />
             </div>
           </div>
 
           <div className="flex space-x-3 pt-4">
-            <Button variant="primary" className="flex-1">Create Job</Button>
-            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
+            <Button variant="primary" className="flex-1">
+              Create Job
+            </Button>
+            <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
+              Cancel
+            </Button>
           </div>
         </div>
       </Modal>
