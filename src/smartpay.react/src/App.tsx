@@ -9,6 +9,7 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Jobs } from './pages/Jobs';
 import { Wallet } from './pages/Wallet';
+import { SecuritySettings } from './pages/SecuritySettings';
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/analytics" element={<div className="p-6"><h1 className="text-2xl font-bold">Analytics</h1><p className="text-gray-600">Coming soon...</p></div>} />
         <Route path="/rules" element={<div className="p-6"><h1 className="text-2xl font-bold">Payment Rules</h1><p className="text-gray-600">Coming soon...</p></div>} />
+        <Route path="/security" element={<SecuritySettings />} />
         <Route path="/settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Settings</h1><p className="text-gray-600">Coming soon...</p></div>} />
       </Route>
     </Routes>

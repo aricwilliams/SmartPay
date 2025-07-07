@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartPay.Models;
+using SmartPay.Models.Security;
 using System.Reflection.Emit;
 
 public class SmartPayDbContext : DbContext
@@ -15,6 +16,12 @@ public class SmartPayDbContext : DbContext
     public DbSet<Evidence> Evidence => Set<Evidence>();
     public DbSet<Wallet> Wallets => Set<Wallet>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<SecurityEvent> SecurityEvents => Set<SecurityEvent>();
+    public DbSet<UserSession> UserSessions => Set<UserSession>();
+    public DbSet<TwoFactorAuth> TwoFactorAuth => Set<TwoFactorAuth>();
+    public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
+    public DbSet<ApiRateLimit> ApiRateLimits => Set<ApiRateLimit>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -58,5 +65,33 @@ public class SmartPayDbContext : DbContext
         b.Entity<Transaction>()
             .Property(t => t.Status)
             .HasConversion<int>();
+
+        // Security entity configurations
+        b.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
+        b.Entity<SecurityEvent>()
+            .HasIndex(s => new { s.UserId, s.Timestamp });
+
+        b.Entity<SecurityEvent>()
+            .HasIndex(s => new { s.IpAddress, s.Timestamp });
+
+        b.Entity<UserSession>()
+            .HasIndex(s => s.SessionToken)
+            .IsUnique();
+
+        b.Entity<UserSession>()
+            .HasIndex(s => new { s.UserId, s.IsActive });
+
+        b.Entity<TwoFactorAuth>()
+            .HasIndex(tf => tf.UserId)
+            .IsUnique();
+
+        b.Entity<LoginAttempt>()
+            .HasIndex(la => new { la.Email, la.AttemptedAt });
+
+        b.Entity<ApiRateLimit>()
+            .HasIndex(rl => new { rl.Identifier, rl.Endpoint });
     }
 }

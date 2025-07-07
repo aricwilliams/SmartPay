@@ -8,6 +8,7 @@ import {
   CogIcon,
   ChartBarIcon,
   ShieldCheckIcon,
+  LockClosedIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -17,6 +18,7 @@ const navigation = [
   { name: 'Wallet', href: '/wallet', icon: WalletIcon },
   { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
   { name: 'Rules', href: '/rules', icon: ShieldCheckIcon },
+  { name: 'Security', href: '/security', icon: LockClosedIcon },
   { name: 'Settings', href: '/settings', icon: CogIcon },
 ];
 
