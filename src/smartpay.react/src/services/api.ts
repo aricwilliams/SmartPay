@@ -42,7 +42,9 @@ export const createWallet = async (userId: string, type: "fiat" | "crypto", curr
 };
 
 export const fetchTransactions = async (walletId: string): Promise<Transaction[]> => {
+  console.log('Fetching transactions for wallet:', walletId);
   const { data } = await axios.get<Transaction[]>(`${API_BASE_URL}/wallets/${walletId}/transactions`);
+  console.log('Transactions received:', data);
   return data;
 };
 

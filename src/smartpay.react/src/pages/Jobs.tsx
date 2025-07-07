@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useJobs } from "../hooks/useJobs";
 import { createJob, JobCreate, completeMilestone, releasePayment, getJobDetails } from "../services/api";
+import { useWallet } from "../contexts/WalletContext";
 import { Button } from "../components/ui/Button";
 import { Card, CardContent, CardHeader } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
@@ -23,6 +24,7 @@ import toast from 'react-hot-toast';
 
 export const Jobs: React.FC = () => {
   const { jobs, mutate } = useJobs();
+  const { refreshWallets } = useWallet();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false);
@@ -150,6 +152,9 @@ export const Jobs: React.FC = () => {
       console.log('Payment released:', result);
       toast.success(`Payment of ${formatCurrency(result.amount)} released successfully!`);
       
+      // Refresh wallets to show updated balances and transactions
+      await refreshWallets();
+      
       // Refresh job details and jobs list
       if (selectedJob) {
         const updatedJob = await getJobDetails(jobId);
@@ -182,6 +187,9 @@ export const Jobs: React.FC = () => {
         // Release payment for completed milestone
         await releasePayment(job.id, completedMilestone.id);
         toast.success(`Payment released for "${completedMilestone.title}"!`);
+        
+        // Refresh wallets after payment release
+        await refreshWallets();
       } else {
         toast.info('No milestones available to progress');
       }

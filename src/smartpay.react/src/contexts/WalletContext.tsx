@@ -37,12 +37,16 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const loadWallets = async () => {
     setIsLoading(true);
     try {
+      console.log('Loading wallets and transactions...');
       const data = await fetchWallets("6B69AEFB-D65C-447B-BE78-98C1FC4E5C0B"); // demo user
+      console.log('Fetched wallets:', data);
       setWallets(data);
 
       // Pull transactions for all wallets in parallel
       const txArrays = await Promise.all(data.map((w) => fetchTransactions(w.id)));
-      setTransactions(txArrays.flat());
+      const allTransactions = txArrays.flat();
+      console.log('Fetched transactions:', allTransactions);
+      setTransactions(allTransactions);
     } finally {
       setIsLoading(false);
     }

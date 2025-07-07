@@ -6,7 +6,8 @@ import {
   ArrowDownIcon, 
   CreditCardIcon,
   BanknotesIcon,
-  ClipboardDocumentIcon
+  ClipboardDocumentIcon,
+  BriefcaseIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -79,11 +80,13 @@ export const Wallet: React.FC = () => {
   };
   const getTransactionIcon = (type: string) => {
     switch (type) {
-      case 'deposit':
       case 'escrow':
+        return <BriefcaseIcon className="w-4 h-4 text-orange-600" />;
+      case 'release':
+        return <ArrowDownIcon className="w-4 h-4 text-green-600" />;
+      case 'deposit':
         return <ArrowDownIcon className="w-4 h-4 text-green-600" />;
       case 'withdrawal':
-      case 'release':
         return <ArrowUpIcon className="w-4 h-4 text-blue-600" />;
       default:
         return <CreditCardIcon className="w-4 h-4 text-gray-600" />;
@@ -92,11 +95,13 @@ export const Wallet: React.FC = () => {
 
   const getTransactionColor = (type: string) => {
     switch (type) {
-      case 'deposit':
       case 'escrow':
+        return 'text-orange-600';
+      case 'release':
+        return 'text-green-600';
+      case 'deposit':
         return 'text-green-600';
       case 'withdrawal':
-      case 'release':
         return 'text-blue-600';
       default:
         return 'text-gray-600';
@@ -257,9 +262,21 @@ export const Wallet: React.FC = () => {
                       {getTransactionIcon(transaction.type)}
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{transaction.description}</p>
+                      <p className="font-medium text-gray-900">
+                        {transaction.description}
+                        {transaction.jobId && (
+                          <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                            <BriefcaseIcon className="w-3 h-3 mr-1" />
+                            Job Payment
+                          </span>
+                        )}
+                      </p>
                       <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <span className="capitalize">{transaction.type}</span>
+                        <span className="capitalize font-medium">
+                          {transaction.type === 'release' ? 'Milestone Payment' : 
+                           transaction.type === 'escrow' ? 'Escrow Hold' : 
+                           transaction.type}
+                        </span>
                         <span>•</span>
                         <span>{formatRelativeTime(transaction.timestamp)}</span>
                         {transaction.processorRef && (
@@ -272,13 +289,20 @@ export const Wallet: React.FC = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`font-bold ${getTransactionColor(transaction.type)}`}>
-                      {transaction.type === 'deposit' || transaction.type === 'escrow' ? '+' : '-'}
+                    <p className={`font-bold text-lg ${getTransactionColor(transaction.type)}`}>
+                      {transaction.type === 'deposit' || transaction.type === 'escrow' || transaction.type === 'release' ? '+' : '-'}
                       {formatCurrency(transaction.amount, transaction.currency)}
                     </p>
-                    <Badge variant={transaction.status === 'completed' ? 'success' : 'warning'}>
+                    <div className="flex items-center justify-end space-x-2 mt-1">
+                      <Badge variant={transaction.status === 'completed' ? 'success' : 'warning'} size="sm">
                       {transaction.status}
-                    </Badge>
+                      </Badge>
+                      {transaction.type === 'release' && (
+                        <Badge variant="info" size="sm">
+                          Released
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))

@@ -51,11 +51,18 @@ namespace SmartPay.Controllers
         [HttpGet("{walletId:guid}")]
         public async Task<ActionResult<WalletDto>> GetWallet(Guid walletId)
         {
+            Console.WriteLine($"GetWallet called for ID: {walletId}");
             var wallet = await _db.Wallets
                 .Include(w => w.Transactions)
                 .FirstOrDefaultAsync(w => w.Id == walletId);
 
-            if (wallet == null) return NotFound();
+            if (wallet == null) 
+            {
+                Console.WriteLine($"Wallet not found: {walletId}");
+                return NotFound();
+            }
+
+            Console.WriteLine($"Wallet found: Balance={wallet.Balance}, Transactions={wallet.Transactions.Count}");
 
             var result = new WalletDto
             {
@@ -80,6 +87,7 @@ namespace SmartPay.Controllers
                 }).ToList()
             };
 
+            Console.WriteLine($"Returning wallet with {result.Transactions.Count} transactions");
             return Ok(result);
         }
 
