@@ -10,7 +10,6 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 export const Card: React.FC<CardProps> = ({ children, className, hoverable = false, gradient = false }) => {
   const baseClasses = "bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden";
   const gradientClasses = gradient ? "bg-gradient-to-br from-white to-gray-50" : "";
-
   const cardContent = <div className={clsx(baseClasses, gradientClasses, className)}>{children}</div>;
 
   if (hoverable) {
