@@ -46,6 +46,29 @@ export const fetchTransactions = async (walletId: string): Promise<Transaction[]
   return data;
 };
 
+export const sendFunds = async (walletId: string, amount: number, currency: string, toAddress: string) => {
+  const { data } = await axios.post(`${API_BASE_URL}/wallets/${walletId}/send`, {
+    amount,
+    currency,
+    toAddress
+  });
+  return data;
+};
+
+export const receiveFunds = async (walletId: string, amount: number, currency: string, description?: string) => {
+  const { data } = await axios.post(`${API_BASE_URL}/wallets/${walletId}/receive`, {
+    amount,
+    currency,
+    description
+  });
+  return data;
+};
+
+export const getWallet = async (walletId: string): Promise<Wallet> => {
+  const { data } = await axios.get<Wallet>(`${API_BASE_URL}/wallets/${walletId}`);
+  return data;
+};
+
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {

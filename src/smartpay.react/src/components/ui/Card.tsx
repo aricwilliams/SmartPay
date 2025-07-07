@@ -4,6 +4,7 @@ import clsx from "clsx";
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   hoverable?: boolean;
+  gradient?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({ children, className, hoverable = false, gradient = false }) => {

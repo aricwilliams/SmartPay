@@ -5,7 +5,8 @@ import {
   ArrowUpIcon, 
   ArrowDownIcon, 
   CreditCardIcon,
-  BanknotesIcon 
+  BanknotesIcon,
+  ClipboardDocumentIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -13,12 +14,69 @@ import { Badge } from '../components/ui/Badge';
 import { Modal } from '../components/ui/Modal';
 import { useWallet } from '../contexts/WalletContext';
 import { formatCurrency, formatRelativeTime, formatAddress } from '../utils/formatting';
+import toast from 'react-hot-toast';
 
 export const Wallet: React.FC = () => {
-  const { wallets, transactions, isLoading, createWallet, getTotalBalance } = useWallet();
+  const { 
+    wallets, 
+    transactions, 
+    isLoading, 
+    createWallet, 
+    getTotalBalance, 
+    sendFundsFromWallet, 
+    receiveFundsToWallet,
+    refreshWallet 
+  } = useWallet();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
+  const [sendForm, setSendForm] = useState({ amount: '', toAddress: '' });
+  const [receiveForm, setReceiveForm] = useState({ amount: '', description: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const selectedWalletData = selectedWallet ? wallets.find(w => w.id === selectedWallet) : null;
+
+  const handleSend = async () => {
+    if (!selectedWallet || !sendForm.amount || !sendForm.toAddress) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await sendFundsFromWallet(selectedWallet, parseFloat(sendForm.amount), sendForm.toAddress);
+      setIsSendModalOpen(false);
+      setSendForm({ amount: '', toAddress: '' });
+    } catch (error) {
+      // Error is handled in context
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleReceive = async () => {
+    if (!selectedWallet || !receiveForm.amount) {
+      toast.error('Please enter an amount');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await receiveFundsToWallet(selectedWallet, parseFloat(receiveForm.amount), receiveForm.description);
+      setIsReceiveModalOpen(false);
+      setReceiveForm({ amount: '', description: '' });
+    } catch (error) {
+      // Error is handled in context
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Address copied to clipboard!');
+  };
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case 'deposit':
@@ -139,10 +197,26 @@ export const Wallet: React.FC = () => {
                 </div>
                 
                 <div className="flex space-x-2">
-                  <Button size="sm" variant="primary" className="flex-1">
+                  <Button 
+                    size="sm" 
+                    variant="primary" 
+                    className="flex-1"
+                    onClick={() => {
+                      setSelectedWallet(wallet.id);
+                      setIsSendModalOpen(true);
+                    }}
+                  >
                     Send
                   </Button>
-                  <Button size="sm" variant="outline" className="flex-1">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => {
+                      setSelectedWallet(wallet.id);
+                      setIsReceiveModalOpen(true);
+                    }}
+                  >
                     Receive
                   </Button>
                 </div>
@@ -250,6 +324,162 @@ export const Wallet: React.FC = () => {
               Create Wallet
             </Button>
             <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Send Modal */}
+      <Modal
+        isOpen={isSendModalOpen}
+        onClose={() => {
+          setIsSendModalOpen(false);
+          setSendForm({ amount: '', toAddress: '' });
+        }}
+        title={`Send ${selectedWalletData?.currency || ''}`}
+        size="md"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Amount
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                step="0.01"
+                value={sendForm.amount}
+                onChange={(e) => setSendForm(prev => ({ ...prev, amount: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="0.00"
+              />
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                {selectedWalletData?.currency}
+              </span>
+            </div>
+            {selectedWalletData && (
+              <p className="text-sm text-gray-500 mt-1">
+                Available: {formatCurrency(selectedWalletData.balance, selectedWalletData.currency)}
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              To Address
+            </label>
+            <input
+              type="text"
+              value={sendForm.toAddress}
+              onChange={(e) => setSendForm(prev => ({ ...prev, toAddress: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter wallet address"
+            />
+          <div className="flex space-x-3 pt-4">
+            <Button 
+              variant="primary" 
+              className="flex-1"
+              onClick={handleSend}
+              isLoading={isSubmitting}
+              disabled={!sendForm.amount || !sendForm.toAddress}
+            >
+              Send Funds
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsSendModalOpen(false);
+                setSendForm({ amount: '', toAddress: '' });
+              }}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Receive Modal */}
+      <Modal
+        isOpen={isReceiveModalOpen}
+        onClose={() => {
+          setIsReceiveModalOpen(false);
+          setReceiveForm({ amount: '', description: '' });
+        }}
+        title={`Receive ${selectedWalletData?.currency || ''}`}
+        size="md"
+      >
+        <div className="space-y-4">
+          {selectedWalletData && (
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-sm font-medium text-gray-700 mb-2">Your Wallet Address:</p>
+              <div className="flex items-center space-x-2">
+                <code className="flex-1 bg-white px-3 py-2 rounded border text-sm">
+                  {selectedWalletData.address}
+                </code>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(selectedWalletData.address)}
+                  leftIcon={<ClipboardDocumentIcon className="w-4 h-4" />}
+                >
+                  Copy
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Amount (for simulation)
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                step="0.01"
+                value={receiveForm.amount}
+                onChange={(e) => setReceiveForm(prev => ({ ...prev, amount: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="0.00"
+              />
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                {selectedWalletData?.currency}
+              </span>
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description (Optional)
+            </label>
+            <input
+              type="text"
+              value={receiveForm.description}
+              onChange={(e) => setReceiveForm(prev => ({ ...prev, description: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Payment for..."
+            />
+          </div>
+          </div>
+          <div className="flex space-x-3 pt-4">
+            <Button 
+              variant="secondary" 
+              className="flex-1"
+              onClick={handleReceive}
+              isLoading={isSubmitting}
+              disabled={!receiveForm.amount}
+            >
+              Simulate Receipt
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsReceiveModalOpen(false);
+                setReceiveForm({ amount: '', description: '' });
+              }}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
           </div>

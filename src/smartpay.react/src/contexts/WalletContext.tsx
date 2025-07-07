@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Wallet, Transaction } from "../types";
-import { fetchTransactions, fetchWallets } from "../services/api";
+import { fetchTransactions, fetchWallets, sendFunds, receiveFunds, getWallet } from "../services/api";
+import toast from 'react-hot-toast';
 
 interface WalletContextType {
   wallets: Wallet[];
@@ -9,6 +10,9 @@ interface WalletContextType {
   refreshWallets: () => void;
   createWallet: (type: "fiat" | "crypto", currency: string) => Promise<void>;
   getTotalBalance: (currency?: string) => number;
+  sendFundsFromWallet: (walletId: string, amount: number, toAddress: string) => Promise<void>;
+  receiveFundsToWallet: (walletId: string, amount: number, description?: string) => Promise<void>;
+  refreshWallet: (walletId: string) => Promise<void>;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -66,6 +70,50 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return wallets.filter((wallet) => !currency || wallet.currency === currency).reduce((total, wallet) => total + wallet.balance, 0);
   };
 
+  const sendFundsFromWallet = async (walletId: string, amount: number, toAddress: string) => {
+    try {
+      const wallet = wallets.find(w => w.id === walletId);
+      if (!wallet) throw new Error('Wallet not found');
+      
+      await sendFunds(walletId, amount, wallet.currency, toAddress);
+      toast.success('Funds sent successfully!');
+      await loadWallets(); // Refresh all wallets
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to send funds');
+      throw error;
+    }
+  };
+
+  const receiveFundsToWallet = async (walletId: string, amount: number, description?: string) => {
+    try {
+      const wallet = wallets.find(w => w.id === walletId);
+      if (!wallet) throw new Error('Wallet not found');
+      
+      await receiveFunds(walletId, amount, wallet.currency, description);
+      toast.success('Funds received successfully!');
+      await loadWallets(); // Refresh all wallets
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to receive funds');
+      throw error;
+    }
+  };
+
+  const refreshWallet = async (walletId: string) => {
+    try {
+      const updatedWallet = await getWallet(walletId);
+      setWallets(prev => prev.map(w => w.id === walletId ? updatedWallet : w));
+      
+      // Update transactions for this wallet
+      const walletTransactions = await fetchTransactions(walletId);
+      setTransactions(prev => [
+        ...prev.filter(t => t.walletId !== walletId),
+        ...walletTransactions
+      ]);
+    } catch (error) {
+      console.error('Failed to refresh wallet:', error);
+    }
+  };
+
   return (
     <WalletContext.Provider
       value={{
@@ -75,6 +123,9 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         refreshWallets,
         createWallet,
         getTotalBalance,
+        sendFundsFromWallet,
+        receiveFundsToWallet,
+        refreshWallet,
       }}
     >
       {children}
