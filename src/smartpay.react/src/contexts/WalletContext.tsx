@@ -72,13 +72,17 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const sendFundsFromWallet = async (walletId: string, amount: number, toAddress: string) => {
     try {
+      console.log('Sending funds:', { walletId, amount, toAddress });
       const wallet = wallets.find(w => w.id === walletId);
       if (!wallet) throw new Error('Wallet not found');
       
-      await sendFunds(walletId, amount, wallet.currency, toAddress);
+      const result = await sendFunds(walletId, amount, wallet.currency, toAddress);
+      console.log('Send funds result:', result);
       toast.success('Funds sent successfully!');
       await loadWallets(); // Refresh all wallets
+      console.log('Wallets refreshed after send');
     } catch (error: any) {
+      console.error('Send funds error:', error);
       toast.error(error.response?.data?.message || 'Failed to send funds');
       throw error;
     }
@@ -86,13 +90,17 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const receiveFundsToWallet = async (walletId: string, amount: number, description?: string) => {
     try {
+      console.log('Receiving funds:', { walletId, amount, description });
       const wallet = wallets.find(w => w.id === walletId);
       if (!wallet) throw new Error('Wallet not found');
       
-      await receiveFunds(walletId, amount, wallet.currency, description);
+      const result = await receiveFunds(walletId, amount, wallet.currency, description);
+      console.log('Receive funds result:', result);
       toast.success('Funds received successfully!');
       await loadWallets(); // Refresh all wallets
+      console.log('Wallets refreshed after receive');
     } catch (error: any) {
+      console.error('Receive funds error:', error);
       toast.error(error.response?.data?.message || 'Failed to receive funds');
       throw error;
     }
