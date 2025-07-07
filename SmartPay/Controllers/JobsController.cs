@@ -104,11 +104,18 @@ namespace SmartPay.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<object>> GetJobById(Guid id)
         {
+            Console.WriteLine($"GetJobById called with ID: {id}");
             var j = await _db.Jobs
                 .Include(x => x.Milestones)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (j is null) return NotFound();
+            if (j is null) 
+            {
+                Console.WriteLine($"Job not found: {id}");
+                return NotFound($"Job with ID {id} not found");
+            }
+
+            Console.WriteLine($"Job found: {j.Title} with {j.Milestones.Count} milestones");
 
             return Ok(new
             {

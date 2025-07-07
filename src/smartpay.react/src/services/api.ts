@@ -148,6 +148,8 @@ export const releasePayment = async (jobId: string, milestoneId: string) => {
 };
 
 export const getJobDetails = async (jobId: string): Promise<Job> => {
-  const { data } = await axios.get<Job>(`${API_BASE_URL}/jobs/${jobId}`);
+  console.log('Fetching job details for:', jobId);
+  const { data } = await axios.get(`${API_BASE_URL}/jobs/${jobId}`);
+  console.log('Job details received:', data);
   return data;
 };

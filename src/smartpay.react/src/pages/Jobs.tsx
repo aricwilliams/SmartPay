@@ -98,12 +98,18 @@ export const Jobs: React.FC = () => {
   };
 
   const handleJobClick = async (job: any) => {
+    console.log('Job card clicked:', job);
     try {
+      setIsJobDetailsOpen(true); // Open modal immediately for better UX
+      setSelectedJob(job); // Set basic job data first
+      
       const jobDetails = await getJobDetails(job.id);
+      console.log('Job details loaded:', jobDetails);
       setSelectedJob(jobDetails);
-      setIsJobDetailsOpen(true);
     } catch (error) {
       console.error('Failed to load job details:', error);
+      setIsJobDetailsOpen(false); // Close modal on error
+      setSelectedJob(null);
       toast.error('Failed to load job details');
     }
   };
@@ -187,7 +193,15 @@ export const Jobs: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {jobs.map((job: any, i: any) => (
           <motion.div key={job.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-            <Card hoverable className="cursor-pointer" onClick={() => handleJobClick(job)}>
+            <Card 
+              hoverable 
+              className="cursor-pointer transition-all duration-200 hover:scale-105" 
+              onClick={(e) => {
+                e.preventDefault();
+                console.log('Card clicked for job:', job.id);
+                handleJobClick(job);
+              }}
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold truncate">{job.title}</h3>
@@ -256,6 +270,7 @@ export const Jobs: React.FC = () => {
       <Modal
         isOpen={isJobDetailsOpen}
         onClose={() => {
+          console.log('Closing job details modal');
           setIsJobDetailsOpen(false);
           setSelectedJob(null);
         }}
@@ -264,8 +279,17 @@ export const Jobs: React.FC = () => {
       >
         {selectedJob && (
           <div className="space-y-6">
+            {/* Loading State */}
+            {!selectedJob.milestones && (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-3 text-gray-600">Loading job details...</span>
+              </div>
+            )}
+            
             {/* Job Overview */}
-            <div className="bg-gray-50 p-4 rounded-lg">
+            {selectedJob.milestones && (
+              <div className="bg-gray-50 p-4 rounded-lg"></Action>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-500">Client:</span>
@@ -292,7 +316,8 @@ export const Jobs: React.FC = () => {
             </div>
 
             {/* Milestones */}
-            <div>
+            {selectedJob.milestones && (
+              <div>
               <h3 className="text-lg font-semibold mb-4">Milestones & Payments</h3>
               <div className="space-y-4">
                 {selectedJob.milestones?.map((milestone: any, index: number) => (
@@ -363,7 +388,8 @@ export const Jobs: React.FC = () => {
                   </Card>
                 ))}
               </div>
-            </div>
+              </div>
+            )}
           </div>
         )}
       </Modal>
