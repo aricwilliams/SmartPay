@@ -1,5 +1,20 @@
 // types/models.ts
-import { JobCreate, MilestoneCreate } from "./dto";
+export interface MilestoneCreate {
+  title: string;
+  description: string;
+  amount: number;
+  dueDate: string; // ISO string
+}
+
+export interface JobCreate {
+  title: string;
+  description: string;
+  client: string;
+  contractor: string;
+  totalAmount: number;
+  currency: string;
+  milestones: MilestoneCreate[];
+}
 
 export interface User {
   id: string;

@@ -136,3 +136,18 @@ export async function createJob(payload: JobCreate): Promise<Job> {
     throw new Error(error?.response?.data?.message || "Failed to create job");
   }
 }
+
+export const completeMilestone = async (jobId: string, milestoneId: string) => {
+  const { data } = await axios.patch(`${API_BASE_URL}/jobs/${jobId}/milestones/${milestoneId}/complete`);
+  return data;
+};
+
+export const releasePayment = async (jobId: string, milestoneId: string) => {
+  const { data } = await axios.post(`${API_BASE_URL}/jobs/${jobId}/milestones/${milestoneId}/release-payment`);
+  return data;
+};
+
+export const getJobDetails = async (jobId: string): Promise<Job> => {
+  const { data } = await axios.get<Job>(`${API_BASE_URL}/jobs/${jobId}`);
+  return data;
+};
