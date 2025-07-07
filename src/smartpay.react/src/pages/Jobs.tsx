@@ -481,7 +481,7 @@ export const Jobs: React.FC = () => {
                                     {milestone.status}
                                   </Badge>
                                   
-                                  {milestone.status === "Pending" && (
+                                  {milestone.status !== "Released" && (
                                     <Button
                                       size="sm"
                                       variant="primary"
@@ -489,11 +489,11 @@ export const Jobs: React.FC = () => {
                                       isLoading={loadingMilestone === milestone.id}
                                       leftIcon={<CheckIcon className="w-4 h-4" />}
                                     >
-                                      Mark Complete
+                                      {milestone.status === "Completed" ? "Re-Complete" : "Mark Complete"}
                                     </Button>
                                   )}
                                   
-                                  {milestone.status === "Completed" && (
+                                  {milestone.status !== "Released" && (
                                     <Button
                                       size="sm"
                                       variant="secondary"

@@ -154,8 +154,8 @@ namespace SmartPay.Controllers
             var milestone = job.Milestones.FirstOrDefault(m => m.Id == milestoneId);
             if (milestone == null) return NotFound("Milestone not found");
             
-            if (milestone.Status != "Pending")
-                return BadRequest($"Milestone is already {milestone.Status}");
+            // Allow completion from any status
+            var previousStatus = milestone.Status;
             
             using var transaction = await _db.Database.BeginTransactionAsync();
             try
@@ -165,7 +165,7 @@ namespace SmartPay.Controllers
                 _db.Milestones.Update(milestone);
                 
                 // Check if all milestones are completed to update job status
-                var allMilestonesCompleted = job.Milestones.All(m => m.Status == "Completed");
+                var allMilestonesCompleted = job.Milestones.All(m => m.Status == "Completed" || m.Status == "Released");
                 if (allMilestonesCompleted)
                 {
                     job.Status = "Completed";
@@ -175,14 +175,15 @@ namespace SmartPay.Controllers
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
                 
-                Console.WriteLine($"Milestone {milestoneId} marked as completed");
+                Console.WriteLine($"Milestone {milestoneId} status changed: {previousStatus} -> Completed");
                 
                 return Ok(new
                 {
                     milestoneId = milestone.Id,
+                    previousStatus = previousStatus,
                     newStatus = milestone.Status,
                     jobStatus = job.Status,
-                    message = "Milestone completed successfully"
+                    message = $"Milestone status changed from {previousStatus} to Completed"
                 });
             }
             catch (Exception ex)
@@ -207,8 +208,21 @@ namespace SmartPay.Controllers
             var milestone = job.Milestones.FirstOrDefault(m => m.Id == milestoneId);
             if (milestone == null) return NotFound("Milestone not found");
             
-            if (milestone.Status != "Completed")
-                return BadRequest("Milestone must be completed before payment release");
+            // Allow payment release from any status (auto-complete if needed)
+            var previousStatus = milestone.Status;
+            
+            // If milestone is not completed, mark it as completed first
+            if (milestone.Status != "Completed" && milestone.Status != "Released")
+            {
+                Console.WriteLine($"Auto-completing milestone {milestoneId} before payment release");
+                milestone.Status = "Completed";
+            }
+            
+            // Skip if already released
+            if (milestone.Status == "Released")
+            {
+                return BadRequest("Payment has already been released for this milestone");
+            }
             
             // Find contractor wallet (for demo, we'll use a default contractor user)
             var contractorUserId = Guid.Parse("6B69AEFB-D65C-447B-BE78-98C1FC4E5C0B"); // Demo contractor
@@ -264,18 +278,20 @@ namespace SmartPay.Controllers
                 await _db.SaveChangesAsync();
                 await transaction.CommitAsync();
                 
-                Console.WriteLine($"Payment released: ${milestone.Amount} to wallet {contractorWallet.Id}");
+                Console.WriteLine($"Payment released: ${milestone.Amount} to wallet {contractorWallet.Id}. Status: {previousStatus} -> Released");
                 Console.WriteLine($"Wallet balance: {originalBalance} -> {contractorWallet.Balance}");
                 
                 return Ok(new
                 {
                     milestoneId = milestone.Id,
+                    previousStatus = previousStatus,
                     amount = milestone.Amount,
                     currency = job.Currency,
                     walletId = contractorWallet.Id,
                     transactionId = paymentTransaction.Id,
                     newWalletBalance = contractorWallet.Balance,
-                    message = "Payment released successfully"
+                    jobStatus = job.Status,
+                    message = $"Payment released successfully. Milestone status: {previousStatus} -> Released"
                 });
             }
             catch (Exception ex)
