@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Wallet, Transaction } from "../types";
-import { fetchTransactions, fetchWallets, sendFunds, receiveFunds, getWallet } from "../services/api";
-import toast from "react-hot-toast";
+import { fetchTransactions, fetchWallets } from "../services/api";
 
 interface WalletContextType {
   wallets: Wallet[];
@@ -37,9 +36,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const loadWallets = async () => {
     setIsLoading(true);
     try {
-      console.log("Loading wallets and transactions...");
       const data = await fetchWallets("6B69AEFB-D65C-447B-BE78-98C1FC4E5C0B"); // demo user
-      console.log("Fetched wallets:", data);
       setWallets(data);
 
       // Pull transactions for all wallets in parallel

@@ -223,6 +223,46 @@ export const Jobs: React.FC = () => {
 
   const getNextAction = (job: any) => {
     if (!job.milestones || job.milestones.length === 0) return null;
+    
+    const pendingMilestone = job.milestones.find((m: any) => m.status === "Pending");
+    const completedMilestone = job.milestones.find((m: any) => m.status === "Completed");
+    
+    if (pendingMilestone) {
+      return {
+        type: 'complete',
+        milestone: pendingMilestone,
+        label: `Complete: ${pendingMilestone.title}`,
+        icon: CheckIcon,
+        color: 'bg-blue-500 hover:bg-blue-600'
+      };
+    } else if (completedMilestone) {
+      return {
+        type: 'release',
+        milestone: completedMilestone,
+        label: `Release: ${formatCurrency(completedMilestone.amount)}`,
+        icon: CurrencyDollarIcon,
+        color: 'bg-green-500 hover:bg-green-600'
+      };
+    }
+    
+    return null;
+  };
+
+  const getMilestoneStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case "completed":
+        return "success";
+      case "released":
+        return "info";
+      case "pending":
+        return "warning";
+      default:
+        return "default";
+    }
+  };
+
+  const getNextAction = (job: any) => {
+    if (!job.milestones || job.milestones.length === 0) return null;
 
     const pendingMilestone = job.milestones.find((m: any) => m.status === "Pending");
     const completedMilestone = job.milestones.find((m: any) => m.status === "Completed");
