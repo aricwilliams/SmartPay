@@ -289,35 +289,35 @@ export const Jobs: React.FC = () => {
             
             {/* Job Overview */}
             {selectedJob.milestones && (
-              <div className="bg-gray-50 p-4 rounded-lg"></Action>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-500">Client:</span>
-                  <span className="ml-2 font-medium">{selectedJob.client}</span>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Client:</span>
+                    <span className="ml-2 font-medium">{selectedJob.client}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Contractor:</span>
+                    <span className="ml-2 font-medium">{selectedJob.contractor}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Total Amount:</span>
+                    <span className="ml-2 font-bold">{formatCurrency(selectedJob.totalAmount, selectedJob.currency)}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Status:</span>
+                    <Badge variant={statusColor(selectedJob.status)} className="ml-2">
+                      {selectedJob.status}
+                    </Badge>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-gray-500">Contractor:</span>
-                  <span className="ml-2 font-medium">{selectedJob.contractor}</span>
-                </div>
-                <div>
-                  <span className="text-gray-500">Total Amount:</span>
-                  <span className="ml-2 font-bold">{formatCurrency(selectedJob.totalAmount, selectedJob.currency)}</span>
-                </div>
-                <div>
-                  <span className="text-gray-500">Status:</span>
-                  <Badge variant={statusColor(selectedJob.status)} className="ml-2">
-                    {selectedJob.status}
-                  </Badge>
+                <div className="mt-3">
+                  <p className="text-gray-700">{selectedJob.description}</p>
                 </div>
               </div>
-              <div className="mt-3">
-                <p className="text-gray-700">{selectedJob.description}</p>
-              </div>
-            </div>
+            )}
 
             {/* Milestones */}
-            {selectedJob.milestones && (
-              <div>
+            <div>
               <h3 className="text-lg font-semibold mb-4">Milestones & Payments</h3>
               <div className="space-y-4">
                 {selectedJob.milestones?.map((milestone: any, index: number) => (
@@ -388,8 +388,7 @@ export const Jobs: React.FC = () => {
                   </Card>
                 ))}
               </div>
-              </div>
-            )}
+            </div>
           </div>
         )}
       </Modal>
