@@ -4,13 +4,18 @@ import clsx from "clsx";
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   hoverable?: boolean;
+  gradient?: boolean;
+  onClick?: () => void;
 }
 
-export const Card: React.FC<CardProps> = ({ children, className, hoverable = false, gradient = false }) => {
+export const Card: React.FC<CardProps> = ({ children, className, hoverable = false, gradient = false, onClick, ...props }) => {
   const baseClasses = "bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden";
   const gradientClasses = gradient ? "bg-gradient-to-br from-white to-gray-50" : "";
-
-  const cardContent = <div className={clsx(baseClasses, gradientClasses, className)}>{children}</div>;
+  const cardContent = (
+    <div className={clsx(baseClasses, gradientClasses, className)} onClick={onClick} {...props}>
+      {children}
+    </div>
+  );
 
   if (hoverable) {
     return (

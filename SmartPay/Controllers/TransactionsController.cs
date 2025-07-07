@@ -14,10 +14,13 @@ namespace SmartPay.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> Get(Guid walletId)
         {
+            Console.WriteLine($"Getting transactions for wallet: {walletId}");
             var tx = await _db.Transactions
                 .Where(t => t.WalletId == walletId)
+                .OrderByDescending(t => t.TimeStamp)
                 .AsNoTracking()
                 .ToListAsync();
+            Console.WriteLine($"Found {tx.Count} transactions for wallet {walletId}");
             return Ok(tx);
         }
 

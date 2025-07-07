@@ -42,7 +42,32 @@ export const createWallet = async (userId: string, type: "fiat" | "crypto", curr
 };
 
 export const fetchTransactions = async (walletId: string): Promise<Transaction[]> => {
+  console.log("Fetching transactions for wallet:", walletId);
   const { data } = await axios.get<Transaction[]>(`${API_BASE_URL}/wallets/${walletId}/transactions`);
+  console.log("Transactions received:", data);
+  return data;
+};
+
+export const sendFunds = async (walletId: string, amount: number, currency: string, toAddress: string) => {
+  const { data } = await axios.post(`${API_BASE_URL}/wallets/${walletId}/send`, {
+    amount,
+    currency,
+    toAddress,
+  });
+  return data;
+};
+
+export const receiveFunds = async (walletId: string, amount: number, currency: string, description?: string) => {
+  const { data } = await axios.post(`${API_BASE_URL}/wallets/${walletId}/receive`, {
+    amount,
+    currency,
+    description,
+  });
+  return data;
+};
+
+export const getWallet = async (walletId: string): Promise<Wallet> => {
+  const { data } = await axios.get<Wallet>(`${API_BASE_URL}/wallets/${walletId}`);
   return data;
 };
 
@@ -113,3 +138,20 @@ export async function createJob(payload: JobCreate): Promise<Job> {
     throw new Error(error?.response?.data?.message || "Failed to create job");
   }
 }
+
+export const completeMilestone = async (jobId: string, milestoneId: string) => {
+  const { data } = await axios.patch(`${API_BASE_URL}/jobs/${jobId}/milestones/${milestoneId}/complete`);
+  return data;
+};
+
+export const releasePayment = async (jobId: string, milestoneId: string) => {
+  const { data } = await axios.post(`${API_BASE_URL}/jobs/${jobId}/milestones/${milestoneId}/release-payment`);
+  return data;
+};
+
+export const getJobDetails = async (jobId: string): Promise<Job> => {
+  console.log("Fetching job details for:", jobId);
+  const { data } = await axios.get(`${API_BASE_URL}/jobs/${jobId}`);
+  console.log("Job details received:", data);
+  return data;
+};
