@@ -124,6 +124,8 @@ namespace SmartPay.Controllers
             {
                 // Debit source wallet
                 sourceWallet.Balance -= dto.Amount;
+                _db.Wallets.Update(sourceWallet);
+                
                 var debitTx = new Transaction
                 {
                     Id = Guid.NewGuid(),
@@ -139,6 +141,8 @@ namespace SmartPay.Controllers
 
                 // Credit destination wallet
                 destinationWallet.Balance += dto.Amount;
+                _db.Wallets.Update(destinationWallet);
+                
                 var creditTx = new Transaction
                 {
                     Id = Guid.NewGuid(),
@@ -185,6 +189,7 @@ namespace SmartPay.Controllers
 
             // Simulate receiving funds (in real app, this would be triggered by payment processor webhook)
             wallet.Balance += dto.Amount;
+            _db.Wallets.Update(wallet);
             
             var transaction = new Transaction
             {
