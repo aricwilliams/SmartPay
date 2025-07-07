@@ -317,78 +317,80 @@ export const Jobs: React.FC = () => {
             )}
 
             {/* Milestones */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Milestones & Payments</h3>
-              <div className="space-y-4">
-                {selectedJob.milestones?.map((milestone: any, index: number) => (
-                  <Card key={milestone.id} className="border">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <span className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-medium">
-                              {index + 1}
-                            </span>
-                            <div>
-                              <h4 className="font-medium text-gray-900">{milestone.title}</h4>
-                              <p className="text-sm text-gray-500">{milestone.description}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="ml-11 flex items-center justify-between">
-                            <div className="flex items-center space-x-4 text-sm">
-                              <span className="text-gray-500">
-                                Amount: <span className="font-medium">{formatCurrency(milestone.amount, selectedJob.currency)}</span>
+            {selectedJob.milestones && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Milestones & Payments</h3>
+                <div className="space-y-4">
+                  {selectedJob.milestones?.map((milestone: any, index: number) => (
+                    <Card key={milestone.id} className="border">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <span className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-medium">
+                                {index + 1}
                               </span>
-                              <span className="text-gray-500">
-                                Due: <span className="font-medium">{new Date(milestone.dueDate).toLocaleDateString()}</span>
-                              </span>
+                              <div>
+                                <h4 className="font-medium text-gray-900">{milestone.title}</h4>
+                                <p className="text-sm text-gray-500">{milestone.description}</p>
+                              </div>
                             </div>
                             
-                            <div className="flex items-center space-x-2">
-                              <Badge variant={getMilestoneStatusColor(milestone.status)}>
-                                {milestone.status}
-                              </Badge>
+                            <div className="ml-11 flex items-center justify-between">
+                              <div className="flex items-center space-x-4 text-sm">
+                                <span className="text-gray-500">
+                                  Amount: <span className="font-medium">{formatCurrency(milestone.amount, selectedJob.currency)}</span>
+                                </span>
+                                <span className="text-gray-500">
+                                  Due: <span className="font-medium">{new Date(milestone.dueDate).toLocaleDateString()}</span>
+                                </span>
+                              </div>
                               
-                              {milestone.status === "Pending" && (
-                                <Button
-                                  size="sm"
-                                  variant="primary"
-                                  onClick={() => handleCompleteMilestone(selectedJob.id, milestone.id)}
-                                  isLoading={loadingMilestone === milestone.id}
-                                  leftIcon={<CheckIcon className="w-4 h-4" />}
-                                >
-                                  Complete
-                                </Button>
-                              )}
-                              
-                              {milestone.status === "Completed" && (
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  onClick={() => handleReleasePayment(selectedJob.id, milestone.id)}
-                                  isLoading={loadingPayment === milestone.id}
-                                  leftIcon={<CurrencyDollarIcon className="w-4 h-4" />}
-                                >
-                                  Release Payment
-                                </Button>
-                              )}
-                              
-                              {milestone.status === "Released" && (
-                                <div className="flex items-center text-green-600 text-sm">
-                                  <CheckIcon className="w-4 h-4 mr-1" />
-                                  Payment Released
-                                </div>
-                              )}
+                              <div className="flex items-center space-x-2">
+                                <Badge variant={getMilestoneStatusColor(milestone.status)}>
+                                  {milestone.status}
+                                </Badge>
+                                
+                                {milestone.status === "Pending" && (
+                                  <Button
+                                    size="sm"
+                                    variant="primary"
+                                    onClick={() => handleCompleteMilestone(selectedJob.id, milestone.id)}
+                                    isLoading={loadingMilestone === milestone.id}
+                                    leftIcon={<CheckIcon className="w-4 h-4" />}
+                                  >
+                                    Complete
+                                  </Button>
+                                )}
+                                
+                                {milestone.status === "Completed" && (
+                                  <Button
+                                    size="sm"
+                                    variant="secondary"
+                                    onClick={() => handleReleasePayment(selectedJob.id, milestone.id)}
+                                    isLoading={loadingPayment === milestone.id}
+                                    leftIcon={<CurrencyDollarIcon className="w-4 h-4" />}
+                                  >
+                                    Release Payment
+                                  </Button>
+                                )}
+                                
+                                {milestone.status === "Released" && (
+                                  <div className="flex items-center text-green-600 text-sm">
+                                    <CheckIcon className="w-4 h-4 mr-1" />
+                                    Payment Released
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </Modal>
